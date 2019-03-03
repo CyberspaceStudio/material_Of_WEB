@@ -228,7 +228,7 @@ BFC的作用：
 
 BFC，从而可以去掉文字环绕的效果
 
-4.常见的两栏布局和三栏布局
+九.**常见的两栏布局和三栏布局**
 
 两栏布局：
 
@@ -283,3 +283,146 @@ BFC，从而可以去掉文字环绕的效果
     </div>
 ~~~
 
+十、**未知宽高的元素实现水平垂直居中**
+
+1.通过display:table实现垂直居中
+
+优势：父元素可以动态改变高度。
+劣势：table属性容易造成多次reflow,IE8以下不支持
+
+~~~html
+  <style>
+    .parent1 {
+      display: table;
+      height: 300px;
+      width: 300px;
+      background-color: #fd0c70;
+    }
+    .parent1 .child {
+      display: table-cell;
+      vertical-align: middle;
+      text-align: center;
+      color: #fff;
+      font-size: 16px;
+    }
+  </style>
+    <body>
+    <div class="parent1">
+      <div class="child">hello world-1</div>
+    </div>
+  </body>
+~~~
+
+2.利用伪元素添加一个新的元素实现：
+
+优点：兼容性好
+缺点：多出来个空元素、麻烦
+
+~~~html
+  <style>
+    .wrap {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      background: #92b922;
+    }
+    .test {
+      background: #de3168;
+      display: inline-block;
+      color: #fff;
+      padding: 20px;
+    }
+    .wrap:after {
+      display: inline-block;
+      content: "";
+      width: 0px;
+      height: 100%;
+      vertical-align: middle;
+    }
+  </style>
+    <div class="wrap">
+    <div class="test">
+      水平垂直居中了吧<br />
+      两行文字哦
+    </div>
+  </div>
+~~~
+
+3.绝对定位+tranform
+
+优点：方便，支持webkit内核
+缺点：transform兼容性差，IE9以下不支持
+
+~~~html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>未知宽高元素水平垂直居中</title>
+</head>
+<style>
+.parent3{
+    position: relative;
+    height:300px;
+    width: 300px;
+    background: #FD0C70;
+}
+.parent3 .child{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #fff;
+    transform: translate(-50%, -50%);
+}
+</style>
+<body>
+<div class="parent3">
+        <div class="child">hello world</div>
+    </div>
+</body>
+</html>
+
+~~~
+
+十一、**列举HTML5特性**
+
+语意化标签(nav、aside、dialog、header、footer等)
+
+canvas
+
+拖放相关api
+
+Audio、Video
+
+获取地理位置
+
+更好的input校验
+
+web存储(localStorage、sessionStorage)
+
+webWorkers(类似于多线程并发)
+
+webSocket
+
+十二、**列举CSS3特性**
+
+选择器
+
+边框(border-image、border-radius、box-shadow)
+
+背景(background-clip、background-origin、background-size)
+
+渐变(linear-gradients、radial-gradents)
+
+字体(@font-face)
+
+转换、形变(transform)
+
+过度(transition)
+
+动画(animation)
+
+弹性盒模型(flex-box)
+
+媒体查询(@media)
