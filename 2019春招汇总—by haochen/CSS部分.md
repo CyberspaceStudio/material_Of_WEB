@@ -90,3 +90,196 @@ p{font-size:10px;-webkit-transform:scale(0.8);} //0.8是缩放比例
 
 1. 原理：有点类似于轮播，整体的元素一直排列下去，假设有5个需要展示的全屏页面，那么高度是500%，只是展示100%，剩下的可以通过transform进行y轴定位，也可以通过margin-top实现
 2. overflow：hidden；transition：all 1000ms ease；
+
+八、**浮动造成父类元素塌陷的解决方案**
+1.构建BFC
+
+~~~
+<style>
+    .father{
+        width: 90px;
+        display:inline-block;
+        background: red;
+    }
+    .brother{
+        float: left;
+        height: 40px;
+        width: 40px;
+        background: blue;
+
+    }
+    </style>
+    <body>
+    <div class="father">
+        <div class="brother"></div>
+    </div>
+</body>
+~~~
+
+2.伪元素法；
+
+~~~html
+<style>
+    .father{
+        width: 90px;
+        background: red;
+    }
+    .father:after{
+        content: "";
+        clear: both;
+        display: block;
+    }
+    .brother{
+        float: left;
+        height: 40px;
+        width: 40px;
+        background: blue;
+    }	
+    </style>
+    <body>
+    <div class="father">
+        <div class="brother"></div>
+    </div>
+</body>
+~~~
+
+这里有几个问题：
+
+首先在设置伪元素的时候，clear:both必须要加上，display必须设置成block，如果设置成inline-block依然存在高度塌陷
+
+构建BFC：
+
+1.根元素
+
+2.float的值不为none（缺点：宽度丢失，并且会使下方的元素上移）
+
+​	position造成的宽度不是100%：直接设置width：100%；
+
+​	设置left：0；right:0
+
+3.display的值为inline-block，table-cell（会导致宽度丢失）
+
+4.position的值为absolute或fixed
+
+5.overflow不为visible
+
+display：table也认为可以生成BFC，其实这里的主要原因在于Table会默认生成一个匿名的table-cell，正是这个匿名的table-ccell生成了BFC
+
+BFC的作用：
+
+1.margin重叠
+
+~~~
+.container {
+            overflow: hidden;
+            width: 100px;
+            height: 100px;
+            background-color: red;
+        }
+        
+        .box1 {
+            width: 20px;
+            height: 20px;
+            margin: 10px 0;
+            background-color: green;
+        }
+        
+        .box2 {
+            width: 20px;
+            height: 20px;
+            margin: 20px 0;
+            background-color: green;
+        }
+    </style>
+        <div class="container">
+                <div class="box1"></div>
+                <div class="box2"></div>
+        </div>
+~~~
+
+这里，相邻两个块儿的margin发生了重叠，并且这里当两个margin不相同的时候，会采用最大的那个margin作为最终结果。
+
+2.防止高度塌陷
+
+3.float文字环绕的问题
+
+~~~html
+<style>
+      .div1 {
+        float: left;
+        height: 100px;
+        width: 100px;
+        background: red;
+      }
+      .div2 {
+        overflow: hidden;
+      }
+</style>
+
+    <div style="width:150px;">
+      <div class="div1"></div>
+      <div class="div2">
+        你好啊啊啊啊啊啊你好啊啊啊啊啊啊你好啊啊啊啊啊啊你好啊啊啊啊啊啊你好啊啊啊啊啊啊你好啊啊啊啊啊啊你好啊啊啊啊啊啊
+      </div>
+    </div>
+~~~
+
+这种情况会导致div2中的文字会沿着浮动的元素环绕，如果不想环绕可以给div2设置overflow: hidden;触发一个
+
+BFC，从而可以去掉文字环绕的效果
+
+4.常见的两栏布局和三栏布局
+
+两栏布局：
+
+~~~html
+    <style>
+        .column:nth-child(1){
+            float: left;
+            width: 200px;
+            height: 300px;
+            margin-right: 10px;
+            background-color: red;
+        }
+        .column:nth-child(2){
+            overflow: hidden;/*创建bfc */
+            height: 300px;
+            background-color: purple;
+        }
+    </style>
+    <div>
+      <div class="column"></div>
+      <div class="column"></div>
+    </div>
+~~~
+
+三栏布局：
+
+~~~html
+    <style>
+      .column:nth-of-type(1),
+      .column:nth-of-type(2) {
+        float: left;
+        width: 100px;
+        height: 300px;
+        background-color: green;
+      }
+
+      .column:nth-of-type(2) {
+        float: right;
+      }
+
+      .column:nth-of-type(3) {
+        overflow: hidden; /*创建bfc*/
+        height: 300px;
+        background-color: red;
+      }
+    </style>
+    
+    <div>
+      <div class="column"></div>
+      <div class="column"></div>
+      <div class="column"></div>
+    </div>
+~~~
+
