@@ -426,3 +426,63 @@ webSocket
 弹性盒模型(flex-box)
 
 媒体查询(@media)
+
+十三、**transition和animation的区别是什么？**
+
+过渡属性transition可以在一定的事件内实现元素的状态过渡为最终状态，用于模拟一种过渡动画效果，但是功能有限，只能用于制作简单的动画效果；
+
+动画属性animation可以制作类似Flash动画，通过关键帧控制动画的每一步，控制更为精确，从而可以制作更为复杂的动画。
+
+十四、**link和@import区别**
+
+**1.从属关系区别**
+`@import`是 CSS 提供的语法规则，只有导入样式表的作用；`link`是HTML提供的标签，不仅可以加载 CSS 文件，还可以定义 RSS、rel 连接属性等。
+
+**2.加载顺序区别**
+加载页面时，`link`标签引入的 CSS 被同时加载；`@import`引入的 CSS 将在页面加载完毕后被加载。
+
+**3.兼容性区别**
+`@import`是 CSS2.1 才有的语法，故只可在 IE5+ 才能识别；`link`标签作为 HTML 元素，不存在兼容性问题。
+
+**4.DOM可控性区别**
+可以通过 JS 操作 DOM ，插入`link`标签来改变样式；由于 DOM 方法是基于文档的，无法使用`@import`的方式插入样式。
+
+**5.权重区别(该项有争议，下文将详解)**
+`link`引入的样式权重大于`@import`引入的样式。
+
+~~~html
+    <link rel="stylesheet" href="test34.css">
+    <style type="text/css">
+        @import url("test33.css");
+    </style>
+<body>
+        <div style="width: 50px; height: 50px;"></div>
+</body>
+~~~
+
+这里会发现div的背景颜色是黄色，说明@import起到了作用（打脸）
+
+~~~html
+    <style type="text/css">
+        @import url("test34.css");
+    </style>
+    <link rel="stylesheet" href="test34.css">
+~~~
+
+这里的背景颜色是绿色
+
+~~~
+    <style type="text/css">
+        div{
+            background:yellow
+        }
+        @import url("test33.css");
+    </style>
+~~~
+
+这里的背景颜色是黄色，且无边框
+
+原因：https://www.cnblogs.com/KilerMino/p/6115803.html
+
+这样做会导致css无法并行下载，因为使用@import引用的文件只有在引用它的那个css文件被下载、解析之后，浏览器才会知道还有另外一个css需要下载，这时才去下载，然后下载后开始解析、构建render tree等一系列操作。
+
