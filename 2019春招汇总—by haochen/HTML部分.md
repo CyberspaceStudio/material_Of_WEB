@@ -171,5 +171,20 @@ F、Set-cookie
 <meta http-equiv="Set-Cookie" content="User=Lxxyx; path=/; expires=Sunday, 10-Jan-16 10:00:00 GMT"> //具体范例
 ~~~
 
+八、**构建DOM树的整个流程**
 
+字节->字符->令牌->节点对象->对象模型。
 
+![1551708673498](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\1551708673498.png)
+
+九、**谈谈渲染阻塞的优化方案**
+
+​	所谓渲染阻塞资源，即是对该资源发送请求后还需要先构建对应的`DOM`树或`CSSOM`树，这种行为显然会延迟渲染操作的开始时间。**HTML、CSS、JavaScript都是会对渲染产生阻塞的资源，HTML是必需的（没有DOM还谈何渲染），但还可以从CSS与JavaScript着手优化，尽可能地减少阻塞的产生。**
+
+​	**当浏览器的HTML解析器遇到一个script标记时会暂停构建DOM，然后将控制权移交至JavaScript引擎，这时引擎会开始执行JavaScript脚本，直到执行结束后，浏览器才会从之前中断的地方恢复，然后继续构建DOM。每次去执行JavaScript脚本都会严重地阻塞DOM树的构建，如果JavaScript脚本还操作了CSSOM，而正好这个CSSOM还没有下载和构建，浏览器甚至会延迟脚本执行和构建DOM，直至完成其CSSOM的下载和构建**。显而易见，如果对`JavaScript`的执行位置运用不当，这将会严重影响渲染的速度。
+
+​	**使用async可以通知浏览器该脚本不需要在引用位置执行**，这样浏览器就可以继续构建`DOM`，`JavaScript`脚本会在就绪后开始执行，这样将显著提升页面首次加载的性能（`async`只可以在`src`标签中使用也就是外部引用的`JavaScript`文件）。
+
+相关链接：https://juejin.im/post/59d489156fb9a00a571d6509
+
+十、*****
