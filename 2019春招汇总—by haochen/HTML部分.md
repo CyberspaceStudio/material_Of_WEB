@@ -73,7 +73,7 @@ A、keywords（关键字）
 
 用于告诉搜索引擎网页的关键字
 
-~~~
+~~~html
 <meta name="keywords" content="Lxxyx,博客，文科生，前端">
 ~~~
 
@@ -81,7 +81,7 @@ B、description（网页内容的描述）
 
 用于告诉搜索引擎网站的主要内容
 
-~~~
+~~~html
 <meta name="description" content="文科生，热爱前端与编程。目前大二，这是我的前端博客"> 
 ~~~
 
