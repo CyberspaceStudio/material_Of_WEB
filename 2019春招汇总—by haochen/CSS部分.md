@@ -21,7 +21,7 @@
             height: 100%;
         }
         .iner1{
-            height: 100px;
+            height: 100px;	
             background:blue
         }
         .iner2{
@@ -485,4 +485,6 @@ webSocket
 原因：https://www.cnblogs.com/KilerMino/p/6115803.html
 
 这样做会导致css无法并行下载，因为使用@import引用的文件只有在引用它的那个css文件被下载、解析之后，浏览器才会知道还有另外一个css需要下载，这时才去下载，然后下载后开始解析、构建render tree等一系列操作。
+
+十四、**如何实现0.5px的边框**
 
