@@ -490,8 +490,6 @@ webSocket
 
 
 
-
-
 十五、**CSS动画和js动画比较**
 
 chrome中，渲染线程分为main thread和compositor thread。如果CSS动画改变的只是`transforms`和`opacity`，那么整个动画是在compositor thread中完成的。而js动画是在main thread中完成的，然后会触发compositor thread进行接下来的操作。但是js执行的过程中，main thread处于繁忙，CSS动画使用compositor thread会相对流畅一点。
