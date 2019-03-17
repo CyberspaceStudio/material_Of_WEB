@@ -488,3 +488,32 @@ webSocket
 
 十四、**如何实现0.5px的边框**
 
+
+
+
+
+十五、**CSS动画和js动画比较**
+
+chrome中，渲染线程分为main thread和compositor thread。如果CSS动画改变的只是`transforms`和`opacity`，那么整个动画是在compositor thread中完成的。而js动画是在main thread中完成的，然后会触发compositor thread进行接下来的操作。但是js执行的过程中，main thread处于繁忙，CSS动画使用compositor thread会相对流畅一点。
+
+CSS动画比JS流畅的前提：
+
+- 在Chromium基础上的浏览器中
+- JS在执行一些昂贵的任务
+- 同时CSS动画不触发layout或paint
+  在CSS动画或JS动画触发了paint或layout时，需要main thread进行Layer树的重计算，这时CSS动画或JS动画都会阻塞后续操作。
+
+两者的对比：
+
+- 实现/重构难度不一，CSS3比JS更简单，性能调优方向固定
+- 对于帧速表现不好的低版本浏览器，CSS3可以做到自然降级，而JS则需要撰写额外代码
+- CSS动画有天然事件支持（`TransitionEnd`、`AnimationEnd`，但是它们都需要针对浏览器加前缀），JS则需要自己写事件
+- JavaScript在浏览器的主线程中运行，而主线程中还有其它需要运行的JavaScript脚本、样式计算、布局、绘制任务等,对其干扰导致线程可能出现阻塞，从而造成丢帧的情况。
+
+- CSS3有兼容性问题，而JS大多时候没有兼容性问题
+- 功能涵盖面，JS比CSS3大
+  - 定义动画过程的`@keyframes`不支持递归定义，如果有多种类似的动画过程，需要调节多个参数来生成的话，将会有很大的冗余（比如jQuery Mobile的动画方案），而JS则天然可以以一套函数实现多个不同的动画过程
+  - 时间尺度上，`@keyframes`的动画粒度粗，而JS的动画粒度控制可以很细
+  - CSS3动画里被支持的时间函数非常少，不够灵活
+  - 以现有的接口，CSS3动画无法做到支持两个以上的状态转化，JavaScript动画控制能力很强, 可以在动画播放过程中对动画进行控制：开始、暂停、回放、终止、取消都是可以做到的。
+

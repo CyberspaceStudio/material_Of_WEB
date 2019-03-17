@@ -19,3 +19,16 @@
 二、**vuex是如何注入到组件中的**
 
 ​	Vuex 利用了 Vue 的 mixin 机制，混合 beforeCreate 钩子，将 store 注入至 Vue 组件实例上，并注册了 Vuex store 的引用属性 $store。
+
+三、**什么是Vuex，简单接收下Vuex相关的一些属性**
+
+​	Vuex 是一个专为 Vue.js 应用程序开发的状态管理模式。它采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化。简单的来说，就是数据共用，对数据集中起来进行统一的管理。
+
+相关的核心概念如下所示：
+
+- State Vuex 使用单一状态树——是的，用一个对象就包含了全部的应用层级状态，将所需要的数据写放这里，类似于data。
+- Getter 有时候我们需要从 store 中的 state 中派生出一些状态，使用Getter，类似于computed。
+- Mutation 更改 Vuex 的 store 中的状态的唯一方法，类似methods。
+- Action Action 提交的是 mutation，而不是直接变更状态，可以包含任意异步操作，这里主要是操作异步操作的，使用起来几乎和mutations方法一模一样,类似methods。
+- Module 当应用变得非常复杂时，store 对象就有可能变得相当臃肿。Vuex 允许我们将 store 分割成模块（module）。每个模块拥有自己的 state、mutation、action、getter、甚至是嵌套子模块。
+

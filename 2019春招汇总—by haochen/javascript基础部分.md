@@ -362,3 +362,244 @@ JSONP由两部分组成：回调函数和数据。回调函数是当响应到来
 <!-- callback({}) -->
 ~~~
 
+10、**谈谈js的垃圾回收和内存泄漏**
+
+JavaScript垃圾回收机制通常有下面的两种机制：
+
+1.**引用计数**
+
+老板浏览器采用的方式，判断一个对象是否要被回收就是要判断是否有引用指向他，如果是那么就回收。这种方式有一个非常糟糕的情况就是循环引用的时候会出现问题。
+
+2.**标记清除**
+
+这个算法就是“对象是否不在需要”定义为“对象是否可以获得”。算法会嘉定有一个根（root）的存在，在JavaScript里面，根是全局对象。垃圾回收期将定期从根开始，找到从根开始引用的对象，然后找到这些对象引用的对象。从根开始，垃圾回收器将找到所有可以获得的对象和不能够获得的对象。这个算法相对于引用计数的优势在于，“有零引用的对象”总是不可获得的，但是相反却不一定。
+
+现在基本上所有的现代浏览器都采用了标记—清除的垃圾回收算法。限制就是哪些无法从根对象查询的对象都将被清除。当然在实际开发的过程中这种情况也很少见。
+
+常见的内存泄漏的场景举例：
+
+1.忘记声明局部变量：
+
+~~~js
+function a(){
+    b=2
+    console.log('b没有被声明!')
+}
+~~~
+
+这个例子中，b没有用var声明，会被认为是一个全局的变量。在页面关闭之前都不会被清除。在严格模式下可以比卖你这种情况。
+
+2.闭包带来的内存泄漏问题：
+
+~~~js
+var leaks = (function(){
+    var leak = 'xxxxxx';// 闭包中引用，不会被回收
+    return function(){
+        console.log(leak);
+    }
+})()
+~~~
+
+leak在闭包中被引用，这时候就不会被回收，当然这里我们是故意不让其被回收的。
+
+3.移除DOM节点的时候忘记暂存的值
+
+有时候出于优化的目的，我们会利用一个变量来暂存节点，使用的时候就不用从DOM中去获取。但是我们在移除节点的时候却忘记了接触暂存的变量对DOM节点的引用，也会造成内存的泄漏。
+
+~~~js
+var element = {
+  image: document.getElementById('image'),
+  button: document.getElementById('button')
+};
+
+document.body.removeChild(document.getElementById('image'));
+// 如果element没有被回收,这里移除了 image 节点也是没用的,image 节点依然留存在内存中.
+~~~
+
+这种情况还有DOM节点绑定了事件，但是在移除的时候没有解除事件的绑定，这时候仅仅移除DOM节点也是没有用的。
+
+4.定时器中的内存泄漏问题：
+
+~~~js
+var someResource = getData();
+setInterval(function() {
+    var node = document.getElementById('Node');
+    if(node) {
+        node.innerHTML = JSON.stringify(someResource));
+    }
+}, 1000);
+
+~~~
+
+由于someResource被定时器引用，因此这里如果不清除定时器的话，someResource也就不会被释放，如果其刚好占用了很大的内存的话，就会引发性能问题。
+
+11.**谈谈js函数的防抖和节流**
+
+函数防抖：
+
+在事件被触发n秒后再执行回调，如果在这n秒内又被触发，则重新计时。
+
+~~~js
+function debounce(fun, delay) {
+    return function (args) {
+        let that = this
+        let _args = args
+        clearTimeout(fun.id)
+        fun.id = setTimeout(function () {
+            fun.call(that, _args)
+        }, delay)
+    }
+}
+~~~
+
+比如现在我们需要做一个input的表单验证，现在我们定义一个keyup事件，如果我们每按下一个键，系统就会为我们做一次验证，很明显这里如果用户没有输入完就不需要做验证，这时候就可以用到防抖处理下，如果用户在设置的delay时间内触发了相同的动作，那么我们就会清除上次的定时器重新开始计时。如果用户在delay时间之外进行这个动作，则可以进行。
+
+函数节流：
+
+规定在一个时间单位内，只触发一次函数，如果在这个单位时间内多次触发了函数，那么也只有一次生效。
+
+~~~js
+function throttle (fn, delay) {
+  let prev = Date.now()
+  return function () {
+    let now = Date.now()
+    let args = arguments
+    if (now - prev >= delay) {
+      fn.apply(this, args)
+      prev = Date.now()
+    }
+  }
+}
+~~~
+
+12、**数组相关的原型方法**
+
+数组：push、pop
+
+concat：
+
+~~~js
+arrayObject.concat(arrayX,arrayX,......,arrayX)		//返回拼接后的数组
+~~~
+
+copyWithin：
+
+~~~js
+array.copyWithin(target, start, end)
+~~~
+
+entries：
+
+~~~js
+array.entries()  //返回键值对
+~~~
+
+slice：（不会改变数组）
+
+```
+arrayObject.slice(start,end)
+```
+
+keys、values、includes、indexOf、lastIndexOf、reverse、splice、unshift（改变数组，返回长度）
+
+13、**string的原型方法**
+
+slice（start,end）、substr（start，length）、substring（start，end）、split（字符串/正则,length）、charAt（pos）、indexOf（searchString，position）、concat（string…） 
+
+14、**jquery事件绑定**
+
+```
+$(selector).bind(event,data,function)
+```
+
+event.stopPropagation() 防止事件冒泡
+
+15、**谈一谈闭包的应用场景和闭包的缺点**
+
+应用场景：
+
+1.函数的防抖：
+
+一般方法实现函数防抖
+
+~~~js
+window.onresize = function(){
+	debounce(fn,1000)
+}
+ var fn = function(){    
+	console.log('fn')
+}
+var time = ''
+function debounce(fn,timeLong){
+   if(time){
+      clearTimeout(time)
+      time = ''
+   }
+
+   time =setTimeout(function(){
+      fn()
+   },timeLong)
+}
+~~~
+
+使用闭包的方式：
+
+~~~js
+window.onresize = debounce(fn,500)
+
+function debounce(fn){
+        var timer = null
+        return function(){
+        if(timer){     //timer第一次执行后会保存在内存里 永远都是执行器 直到最后被触发
+           clearTimeout(timer)
+            timer = null
+        }
+        timer = setTimeout(function(){
+
+            fn()
+        },1000)
+        
+        }
+    
+}
+var fn = function(){
+
+    console.log('fn')
+}
+~~~
+
+2.使用闭包实现单例模式：
+
+~~~js
+class CreateUser {
+    constructor(name) {
+        this.name = name;
+        this.getName();
+    }
+    getName() {
+         return this.name;
+    }
+}
+// 代理实现单例模式
+var ProxyMode = (function() {
+    var instance = null;
+    return function(name) {
+        if(!instance) {
+            instance = new CreateUser(name);
+        }
+        return instance;
+    }
+})();
+// 测试单体模式的实例
+var a = ProxyMode("aaa");
+var b = ProxyMode("bbb");
+// 因为单体模式是只实例化一次，所以下面的实例是相等的
+console.log(a === b);    //true
+~~~
+
+3.为多个组件设置不同的值
+
+4.设置私有变量
+
+5.异步问题正确执行
+
