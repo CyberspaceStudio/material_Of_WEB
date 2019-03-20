@@ -33,8 +33,6 @@ function newOperator(ctor){
 }
 ~~~
 
-
-
 2.**手写call函数**
 
  ~~~js
