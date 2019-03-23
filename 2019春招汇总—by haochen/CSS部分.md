@@ -169,7 +169,8 @@ BFC的作用：
 
 1.margin重叠
 
-~~~
+~~~html
+<style>
 .container {
             overflow: hidden;
             width: 100px;
@@ -471,7 +472,7 @@ webSocket
 
 这里的背景颜色是绿色
 
-~~~
+~~~html
     <style type="text/css">
         div{
             background:yellow
